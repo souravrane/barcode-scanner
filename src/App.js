@@ -1,25 +1,38 @@
-import React, { useState } from "react";
-import Scanner from "./scanner";
+import React, { Component } from "react";
+import Scanner from "./Scanner";
+import Result from "./Result";
 
-import "./App.css";
-
-function App() {
-  const [camera, setCamera] = useState(false);
-  const [result, setResult] = useState(null);
-
-  const onDetected = (result) => {
-    setResult(result);
+class App extends Component {
+  state = {
+    scanning: false,
+    results: []
   };
 
-  return (
-    <div className="App">
-      <p>{result ? result : "Scanning..."}</p>
-      <button onClick={() => setCamera(!camera)}>
-        {camera ? "Stop" : "Start"}
-      </button>
-      <div className="container">{camera && <Scanner />}</div>
-    </div>
-  );
+  _scan = () => {
+    this.setState({ scanning: !this.state.scanning });
+  };
+
+  _onDetected = (result) => {
+    this.setState({ results: this.state.results.concat([result]) });
+  };
+
+  render() {
+    return (
+      <div>
+        <button onClick={this._scan}>
+          {this.state.scanning ? "Stop" : "Start"}
+        </button>
+
+        <ul className="results">
+          {this.state.results.map((result, i) => (
+            <Result key={result.codeResult.code + i} result={result} />
+          ))}
+        </ul>
+
+        {this.state.scanning ? <Scanner onDetected={this._onDetected} /> : null}
+      </div>
+    );
+  }
 }
 
 export default App;
